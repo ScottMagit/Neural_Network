@@ -42,7 +42,7 @@ def w_Create(net):
 	
 	#input-weight matrix
 	#random values [-0.5,0.5]
-	IW[1, 1] = np.random.rand(layers[0], inputs) - 0.5
+	IW[1, 1] = np.random.randn(layers[0], inputs)
 	X.append(1) 	#first layer is input layer
 	
 	'''Internal Connection Weight Matrices'''
@@ -52,11 +52,11 @@ def w_Create(net):
 
 		if m>1:
 			l = m-1
-			LW[m, l] = np.random.rand(layers[m-1], layers[l-1])-0.5 #connection weight matrix
+			LW[m, l] = np.random.randn(layers[m-1], layers[l-1]) #connection weight matrix
 			L_b[l].append(m) #layer m has backward connection to layer l
 			L_f[m].append(l) #layer l has forward connection to layer m
 
-		b[m] = np.random.rand(layers[m-1])-0.5#create bias vector for layer m
+		b[m] = np.random.randn(layers[m-1])#create bias vector for layer m
 	
 	if M not in U:
 		U.append(M) # #add M to output layers if not yet done
@@ -692,35 +692,25 @@ def loadNN(filename):
 	
 	return net
 
-def imputdata(path):
+def inputdata(path):
 	"""Prepare Input Data
 	"""
 	df = pd.read_csv(path, sep=',')
-	P = np.array([df['BDE(radical)'].values, df['BDE(substrate)'].values, df['d'].values, df['x2'].values])
+	P = np.array([df['BDFE_cat'].values, df['BDFE_sub'].values, df['x_cat'].values, df['x_sub'].values, df['d'].values, df['Vbur_cat'].values, df['Vbur_sub'].values])
 	Y = np.array(df['gibbs'].values)
 
 	return P, Y
 
-def trainNN(nn, P, Y, Ptest, Ytest, cycle):
+def trainNN(nn, P, Y):
 	"""train Neural Network
 	"""
-	for num in range(0, cycle):
-		net = CreateNN(nn)
-		# Train NN with training data P=input and Y=target
-		# Set maximum number of iterations k_max to 500
-		# Set termination condition for Error E_stop to 1e-5
-		# The Training will stop after 500 iterations or when the Error <=E_stop
-		net = train_LM(P, Y, net, verbose=True, k_max=1000, E_stop=1e-5)
+	np.random.seed(64)
+	net = CreateNN(nn)
+	# Train NN with training data P=input and Y=target
+	# Set maximum number of iterations k_max to 500
+	# The Training will stop after 500 iterations or when the Error <=E_stop
+	net = train_LM(P, Y, net, verbose=True, k_max=500, E_stop=0.25)
 
-		mse = np.average((Y - NNOut(P, net)) ** 2)
-		R2 = 1 - mse / np.var(Y)
-		mse2 = np.average((Ytest - NNOut(Ptest, net)) ** 2)
-		R22 = 1 - mse2 / np.var(Ytest)
-
-		if R2 - 0.94 > 0 and R22 - 0.75 > 0:
-			break
-
-	print('sum:', num)
 	return net
 
 def R(name, Y, y):
@@ -740,12 +730,13 @@ def R(name, Y, y):
 	return
 
 
-P, Y = imputdata('train.csv')
-Ptest, Ytest = imputdata('test.csv')
-Ptest2, Ytest2 = imputdata('selectivity.csv')
+P, Y = inputdata('train.csv')
+Ptest, Ytest = inputdata('test.csv')
+Ptest2, Ytest2 = inputdata('selectivity.csv')
+Ptest3, Ytest3 = inputdata('cumoexp.csv')
 
-# net = trainNN([4,3,3,3,1], P, Y, Ptest, Ytest, 30)
-net = loadNN('mynetwork.csv')
+net = trainNN([7,6,6,6,1], P, Y)
+# net = loadNN('mynetwork.csv')
 
 saveNN(net,'mynetwork.csv')
 
@@ -761,6 +752,11 @@ R('test', Ytest, ytest)
 # print('ytest:', ytest)
 
 ytest2 = NNOut(Ptest2,net)
-R('prediction_selectivity', Ytest2, ytest2)
+R('CH3O_selectivity', Ytest2, ytest2)
 ytest2 = ytest2.reshape(-1,1)
-print('prediction_selectivity:', ytest2)
+print('CH3O_selectivity:', ytest2)
+
+ytest3 = NNOut(Ptest3,net)
+R('CumO_exp', Ytest3, ytest3)
+# ytest3 = ytest3.reshape(-1,1)
+# print('CumO_exp:', ytest3)
