@@ -1,6 +1,6 @@
 Neural_Network
 =
-An artificial neural network predicting activation energies in hydrogen atom transfer based sp3 C-H activation.
+The artificial neural network predicting activation energies in hydrogen atom transfer based sp3 C-H activation.
 
 Dataset availability
 =
