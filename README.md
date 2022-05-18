@@ -4,7 +4,7 @@ An artificial neural network predicting activation energies in hydrogen atom tra
 
 Dataset availability
 =
-Density functional theory calculations (UωB97X-D) are used to establish the reaction system dataset of methoxyl (CH3O•), trichloroethoxyl (CCl3CH2O•), trifluoroethoxyl (CF3CH2O•), tert-butoxyl (tBuO•) and cumyloxyl (CumO•) radicals. Optimized cartesian coordinates are available in “cartesian coordinates of DFT-computed structures.zip”.
+Density functional theory calculations (UωB97X-D) are used to establish the reaction system dataset of methoxyl, trichloroethoxyl, trifluoroethoxyl, tert-butoxyl and cumyloxyl radicals. Optimized cartesian coordinates are available in “cartesian coordinates of DFT-computed structures.zip”.
 
 How to use the model
 =
